@@ -12,7 +12,7 @@ pipeline {
 			steps {
 				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]){
 					sh '''
-						docker build -t mehmetincefidan/capstone .
+						docker build -t ahmedtahalhosari/capstone .
 					'''
 				}
 			}
@@ -23,7 +23,7 @@ pipeline {
 				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]){
 					sh '''
 						docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-						docker push mehmetincefidan/capstone
+						docker push ahmedtahalhosari/capstone
 					'''
 				}
 			}
@@ -31,7 +31,7 @@ pipeline {
 
 		stage('Set current kubectl context') {
 			steps {
-				withAWS(region:'us-east-1', credentials:'ecr_credentials') {
+				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
 						kubectl config use-context arn:aws:eks:us-east-1:142977788479:cluster/capstonecluster
 					'''
@@ -41,7 +41,7 @@ pipeline {
 
 		stage('Deploy blue container') {
 			steps {
-				withAWS(region:'us-east-1', credentials:'ecr_credentials') {
+				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
 						kubectl apply -f ./blue-controller.json
 					'''
@@ -51,7 +51,7 @@ pipeline {
 
 		stage('Deploy green container') {
 			steps {
-				withAWS(region:'us-east-1', credentials:'ecr_credentials') {
+				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
 						kubectl apply -f ./green-controller.json
 					'''
@@ -61,7 +61,7 @@ pipeline {
 
 		stage('Create the service in the cluster, redirect to blue') {
 			steps {
-				withAWS(region:'us-east-1', credentials:'ecr_credentials') {
+				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
 						kubectl apply -f ./blue-service.json
 					'''
@@ -77,7 +77,7 @@ pipeline {
 
 		stage('Create the service in the cluster, redirect to green') {
 			steps {
-				withAWS(region:'us-east-1', credentials:'ecr_credentials') {
+				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
 						kubectl apply -f ./green-service.json
 					'''

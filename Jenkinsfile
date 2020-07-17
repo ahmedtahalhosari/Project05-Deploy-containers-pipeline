@@ -4,7 +4,7 @@ pipeline {
 
 		stage('Lint HTML') {
 			steps {
-				sh 'tidy -q -e *.html'
+				sh 'sudo tidy -q -e *.html'
 			}
 		}
 		
@@ -12,7 +12,7 @@ pipeline {
 			steps {
 				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]){
 					sh '''
-						docker build -t ahmedtahalhosari/capstone .
+						sudo docker build -t ahmedtahalhosari/capstone .
 					'''
 				}
 			}
@@ -22,8 +22,8 @@ pipeline {
 			steps {
 				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD']]){
 					sh '''
-						docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-						docker push ahmedtahalhosari/capstone
+						sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+						sudo docker push ahmedtahalhosari/capstone
 					'''
 				}
 			}
@@ -33,7 +33,7 @@ pipeline {
 			steps {
 				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
-						kubectl config use-context arn:aws:eks:us-east-2:984962166166:cluster/capstonecluster
+						sudo kubectl config use-context arn:aws:eks:us-east-2:984962166166:cluster/capstonecluster
 					'''
 				}
 			}
@@ -43,7 +43,7 @@ pipeline {
 			steps {
 				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
-						kubectl apply -f ./blue-controller.json
+						sudo kubectl apply -f ./blue-controller.json
 					'''
 				}
 			}
@@ -53,7 +53,7 @@ pipeline {
 			steps {
 				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
-						kubectl apply -f ./green-controller.json
+						sudo kubectl apply -f ./green-controller.json
 					'''
 				}
 			}
@@ -63,7 +63,7 @@ pipeline {
 			steps {
 				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
-						kubectl apply -f ./blue-service.json
+						sudo kubectl apply -f ./blue-service.json
 					'''
 				}
 			}
@@ -79,7 +79,7 @@ pipeline {
 			steps {
 				withAWS(region:'us-east-2', credentials: 'aws-static') {
 					sh '''
-						kubectl apply -f ./green-service.json
+						sudo kubectl apply -f ./green-service.json
 					'''
 				}
 			}
